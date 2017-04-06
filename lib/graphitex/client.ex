@@ -4,11 +4,12 @@ defmodule Graphitex.Client do
   """
 
   use GenServer
+  require Logger
 
   @name __MODULE__
 
   def start_link do
-    GenServer.start_link(__MODULE__, :ok, name: @name)
+    GenServer.start_link(__MODULE__, %{socket: nil}, name: @name)
   end
 
   @doc """
@@ -24,7 +25,7 @@ defmodule Graphitex.Client do
     metric(value, namespace, Float.round(ts, 1))
   end
   def metric(value, namespace, ts) do
-    GenServer.cast(@name, {:metric, value, namespace, ts})
+    GenServer.cast(@name, {:metric, pack_msg(value, namespace, ts)})
   end
 
 
@@ -32,26 +33,37 @@ defmodule Graphitex.Client do
   # Private API
   #
 
+  defp pack_msg(val, ns, ts) do
+    '#{ns} #{val} #{ts}\n'
+  end
   #
   # GenServer callbacks
   #
 
-  def init(:ok) do
-    port = Application.get_env(:graphitex, :port, 2004)
-    host = Application.get_env(:graphitex, :host, '188.166.64.102')
-    {:ok, socket} = :gen_udp.open(0)
-    {:ok, %{socket: socket, host: host, port: port}}
+  def init(state) do
+    connect(state)
+  end
+
+  def connect(state) do
+    port = Application.get_env(:graphitex, :port, 2003)
+    host = Application.get_env(:graphitex, :host)
+    opts = [:binary, active: false]
+    Logger.info fn -> "Connecting to #{host}:#{port}" end
+    case :gen_tcp.connect(host, port, opts) do
+      {:ok, socket} ->
+        {:ok, %{state | socket: socket}}
+      {:error, reason} ->
+        Logger.error fn -> "Could not connect: #{reason}" end
+        {:error, {:connect, reason}}
+    end
   end
 
   def stop(server, _reason, _timeout) do
-    :gen_udp.close(server)
+    :gen_tcp.close(server)
   end
 
-  def handle_cast({:metric, val, ns, ts}, %{socket: socket, host: host, port: port} = state) do
-    msg = "#{ns} #{val} #{ts}"
-    IO.inspect msg
-    stat = :gen_udp.send(socket, host, port, msg)
-    IO.inspect stat
+  def handle_cast({:metric, msg}, %{socket: socket} = state) do
+    :ok = :gen_tcp.send(socket, msg)
     {:noreply, state}
   end
 
