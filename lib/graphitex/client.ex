@@ -54,12 +54,12 @@ defmodule Graphitex.Client do
         {:ok, %{state | socket: socket}}
       {:error, reason} ->
         Logger.error fn -> "Could not connect: #{reason}" end
-        {:error, {:connect, reason}}
+        {:stop, {:connect, reason}}
     end
   end
 
-  def stop(server, _reason, _timeout) do
-    :gen_tcp.close(server)
+  def terminate(_reason, state) do
+    :gen_tcp.close(state.socket)
   end
 
   def handle_cast({:metric, msg}, %{socket: socket} = state) do
