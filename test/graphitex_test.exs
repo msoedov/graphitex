@@ -2,7 +2,7 @@ defmodule GraphitexTest do
   use ExUnit.Case
   doctest Graphitex
 
-  test "the truth" do
-    assert 1 + 1 == 2
+  test "collect metric" do
+    assert :ok == Graphitex.metric(4, "foo.bar")
   end
 end
