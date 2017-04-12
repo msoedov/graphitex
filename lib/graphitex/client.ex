@@ -24,8 +24,8 @@ defmodule Graphitex.Client do
   def metric(value, namespace, ts) when is_float(ts) do
     metric({value, namespace, Float.round(ts, 1)})
   end
-  def metric(params) do
-    GenServer.cast(@name, {:metric, pack_msg(params)})
+  def metric(measurement) do
+    GenServer.cast(@name, {:metric, pack_msg(measurement)})
   end
 
   def metric_batch(batch) do
