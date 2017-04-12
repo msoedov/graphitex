@@ -16,23 +16,34 @@ defmodule Graphitex.Client do
   Add a node and the service it provides to the directory.
   """
   def metric(value, namespace) when is_list(namespace) do
-    metric(value, Enum.join(namespace, "."))
+    metric({value, Enum.join(namespace, ".")})
   end
   def metric(value, namespace) when is_binary(namespace) do
-    metric(value, namespace, :os.system_time(:seconds))
+    metric({value, namespace})
   end
   def metric(value, namespace, ts) when is_float(ts) do
-    metric(value, namespace, Float.round(ts, 1))
+    metric({value, namespace, Float.round(ts, 1)})
   end
-  def metric(value, namespace, ts) do
-    GenServer.cast(@name, {:metric, pack_msg(value, namespace, ts)})
+  def metric(params) do
+    GenServer.cast(@name, {:metric, pack_msg(params)})
   end
 
-
+  def metric_batch(batch) do
+    bulk_mgs = batch
+    |> Enum.map(&pack_msg/1)
+    |> Enum.join("")
+    GenServer.cast(@name, {:metric, bulk_mgs})
+  end
   #
   # Private API
   #
 
+  defp pack_msg({val, ns}=_arg) do
+    pack_msg(val, ns, :os.system_time(:seconds))
+  end
+  defp pack_msg({val, ns, ts}=_arg) do
+    pack_msg(val, ns, ts)
+  end
   defp pack_msg(val, ns, ts) do
     '#{ns} #{val} #{ts}\n'
   end

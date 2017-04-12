@@ -14,5 +14,11 @@ defmodule Graphitex do
 
   defdelegate metric(value, namespace), to: Graphitex.Client
   defdelegate metric(value, namespace, ts), to: Graphitex.Client
+  defdelegate metric_batch(msgs), to: Graphitex.Client
+
+
+  def now do
+    :os.system_time(:seconds)
+  end
 
 end
