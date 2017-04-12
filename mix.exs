@@ -7,6 +7,8 @@ defmodule Graphitex.Mixfile do
      elixir: "~> 1.3",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
+     description: "Graphite tcp client",
+     package: package(),
      deps: deps()]
   end
 
@@ -17,6 +19,15 @@ defmodule Graphitex.Mixfile do
     [ mod: {Graphitex, []},
       applications: [:logger],
       registered: [Graphitex.Client],
+    ]
+  end
+
+  defp package do
+    [
+      files: ["lib", "mix.exs", "README.md", "LICENSE"],
+      maintainers: ["Alex Myasoedov"],
+      licenses: ["MIT"],
+      links: %{"GitHub" => "https://github.com/msoedov/graphitex"},
     ]
   end
 
