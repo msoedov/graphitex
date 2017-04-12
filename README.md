@@ -15,26 +15,26 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
 
   1. Add `graphitex` to your list of dependencies in `mix.exs`:
 
-    ```elixir
-    def deps do
-      [{:graphitex, "~> 0.1.0"}]
-    end
-    ```
+  ```elixir
+  def deps do
+    [{:graphitex, "~> 0.1.0"}]
+  end
+  ```
 
   2. Ensure `graphitex` is started before your application:
 
-    ```elixir
-    def application do
-      [applications: [:graphitex]]
-    end
+  ```elixir
+  def application do
+    [applications: [:graphitex]]
+  end
 
-    ```
+  ```
   3. Set up configuration in `config.config.exs`:
 
-    ```elixir
-    config :graphitex, host: '188.166.101.102', port: 2003
-    
-    ```
+  ```elixir
+  config :graphitex, host: '188.166.101.102', port: 2003
+
+  ```
   4. API:
 
   ```elixir
