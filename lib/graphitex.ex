@@ -1,6 +1,10 @@
 defmodule Graphitex do
   use Application
 
+  @moduledoc"""
+  A supervisor with delegate functions to a gen server with tcp connection to
+  carbon server.
+  """
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
 
@@ -15,7 +19,6 @@ defmodule Graphitex do
   defdelegate metric(value, namespace), to: Graphitex.Client
   defdelegate metric(value, namespace, ts), to: Graphitex.Client
   defdelegate metric_batch(msgs), to: Graphitex.Client
-
 
   def now do
     :os.system_time(:seconds)

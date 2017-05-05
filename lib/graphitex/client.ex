@@ -34,19 +34,21 @@ defmodule Graphitex.Client do
     |> Enum.join("")
     GenServer.cast(@name, {:metric, bulk_mgs})
   end
+
   #
   # Private API
   #
 
-  defp pack_msg({val, ns}=_arg) do
+  defp pack_msg({val, ns} = _arg) do
     pack_msg(val, ns, :os.system_time(:seconds))
   end
-  defp pack_msg({val, ns, ts}=_arg) do
+  defp pack_msg({val, ns, ts} = _arg) do
     pack_msg(val, ns, ts)
   end
   defp pack_msg(val, ns, ts) do
     '#{ns} #{val} #{ts}\n'
   end
+
   #
   # GenServer callbacks
   #
@@ -71,7 +73,6 @@ defmodule Graphitex.Client do
   def terminate(_reason, %{socket: socket} = state) when not is_nil(socket) do
     :gen_tcp.close(state.socket)
   end
-
 
   def handle_cast(msg, %{socket: nil} = state) do
     connected_state = connect(state)
