@@ -6,6 +6,7 @@ Graphite client for Elixir with zero dependencies
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/msoedov/graphitex/blob/master/LICENSE)
 [![Hex Version](https://img.shields.io/hexpm/v/graphitex.svg)](https://hex.pm/packages/graphitex)
 [![Build Status](https://travis-ci.org/msoedov/graphitex.svg?branch=master)](https://travis-ci.org/msoedov/graphitex)
+[![Open Source Helpers](https://www.codetriage.com/msoedov/graphitex/badges/users.svg)](https://www.codetriage.com/msoedov/graphitex)
 
 
 
