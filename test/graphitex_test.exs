@@ -10,6 +10,14 @@ defmodule GraphitexTest do
     assert :ok == Graphitex.metric(4, [:aws, :node1, :avg_cpu])
   end
 
+  test "collect metric atom tags and a Graphitex.now()" do
+    assert :ok == Graphitex.metric(4, [:aws, :node1, :avg_cpu], Graphitex.now())
+  end
+
+  test "collect metric atom tags and an :os.system_time(:seconds)" do
+    assert :ok == Graphitex.metric(4, [:aws, :node1, :avg_cpu], :os.system_time(:seconds))
+  end
+
   test "batch send" do
     batch = [
       {4, "client.transactions.east"},
@@ -21,8 +29,8 @@ defmodule GraphitexTest do
 
   test "stream batch" do
     1..10
-    |> Enum.map(fn n ->
-      :ok = Graphitex.metric(n, "aws.node1.load")
+    |> Enum.each(fn (x) ->
+      :ok = Graphitex.metric(x, "aws.node1.load")
     end)
   end
 end

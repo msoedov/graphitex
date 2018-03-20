@@ -21,7 +21,7 @@ defmodule Graphitex do
   defdelegate metric_batch(msgs), to: Graphitex.Client
 
   def now do
-    :os.system_time(:seconds)
+    :os.system_time(:seconds) / 1
   end
 
 end
