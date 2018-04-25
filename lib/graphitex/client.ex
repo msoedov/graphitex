@@ -80,12 +80,20 @@ defmodule Graphitex.Client do
 
   def connect(state) do
     port = Application.get_env(:graphitex, :port, 2003)
-    host = Application.get_env(:graphitex, :host)
+    host = host()
     opts = [:binary, active: false]
     Logger.info fn -> "Connecting to carbon at #{host}:#{port}" end
     {:ok, socket} = :gen_tcp.connect(host, port, opts)
     Logger.info "Connected"
     %{state | socket: socket}
+  end
+
+  defp host() do
+    host = Application.get_env(:graphitex, :host)
+    case is_binary(host) do
+      true -> String.to_charlist(host)
+      false -> host
+    end
   end
 
   def terminate({:error, :closed}, state) do
