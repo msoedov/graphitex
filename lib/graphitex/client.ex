@@ -15,18 +15,31 @@ defmodule Graphitex.Client do
   @doc """
   Add a node and the service it provides to the directory.
   """
+  @spec metric(number, [String.t], Float.t) :: nil
+  def metric(value, namespace, ts) when is_list(namespace) and is_float(ts) do
+    metric({value, Enum.join(namespace, "."), ts})
+  end
+
+  @spec metric(number, [String.t], number) :: nil
+  def metric(value, namespace, ts) when is_list(namespace) and is_number(ts) do
+    metric({value, Enum.join(namespace, "."), Float.round(ts / 1, 1)})
+  end
+
+  @spec metric(number, binary|String.t, Float.t) :: nil
+  def metric(value, namespace, ts) when  is_float(ts) do
+    metric({value, namespace, Float.round(ts, 1)})
+  end
+
   @spec metric(number, [String.t]) :: nil
   def metric(value, namespace) when is_list(namespace) do
     metric({value, Enum.join(namespace, ".")})
   end
+
   @spec metric(number, binary) :: nil
   def metric(value, namespace) when is_binary(namespace) do
     metric({value, namespace})
   end
-  @spec metric(number, binary|String.t, Float.t) :: nil
-  def metric(value, namespace, ts) when is_float(ts) do
-    metric({value, namespace, Float.round(ts, 1)})
-  end
+
   @spec metric({number, binary|String.t, Float.t}) :: nil
   def metric(measurement) do
     GenServer.cast(@name, {:metric, pack_msg(measurement)})
@@ -67,12 +80,20 @@ defmodule Graphitex.Client do
 
   def connect(state) do
     port = Application.get_env(:graphitex, :port, 2003)
-    host = Application.get_env(:graphitex, :host)
+    host = host()
     opts = [:binary, active: false]
     Logger.info fn -> "Connecting to carbon at #{host}:#{port}" end
     {:ok, socket} = :gen_tcp.connect(host, port, opts)
     Logger.info "Connected"
     %{state | socket: socket}
+  end
+
+  defp host() do
+    host = Application.get_env(:graphitex, :host)
+    case is_binary(host) do
+      true -> String.to_charlist(host)
+      false -> host
+    end
   end
 
   def terminate({:error, :closed}, state) do
